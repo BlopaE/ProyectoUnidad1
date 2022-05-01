@@ -1,4 +1,3 @@
-
 package ventanas;
 
 import java.awt.BorderLayout;
@@ -12,41 +11,42 @@ import java.net.URL;
 import java.util.Arrays;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
+import model.ListaUsuarios;
+import model.Usuario;
+
+
 /**
  *
  * @author Pablo Erick Ramírez Cruz
  */
-public class Login extends JFrame{
-    
-    private JTextField userField;
+public class Login extends JFrame {
+
+    private JComboBox userField;
     private JPasswordField passwordField;
-    private JButton loginButton,viewPassButton;
+    private JButton loginButton, viewPassButton;
     private boolean showPassword = false;
-    private String user = "Admin";
-    private char[] password = {'1','2','3','4'};
-    
+    private JFrame contexto = this;
+
     public Login() {
-        
+
         //Ventana
-        this.setSize(400,300);
+        this.setSize(400, 300);
         this.setTitle("Acceso al sistema");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setIconImage(Constantes.icon.getImage());
-        
-        
+
         //Contenedor
         Container contenedor = this.getContentPane();
-        contenedor.setLayout(new GridLayout(1,5));
+        contenedor.setLayout(new GridLayout(1, 5));
         JLabel logo = new JLabel();
         URL ruta = Login.class.getResource("logo.png");
         ImageIcon imagen = new ImageIcon(ruta);
@@ -54,43 +54,47 @@ public class Login extends JFrame{
         logo.setIcon(new ImageIcon(imagenRedimensionada));
         logo.setHorizontalAlignment(JLabel.CENTER);
         JPanel panelIzq = new JPanel(new BorderLayout());
-        panelIzq.add(logo,BorderLayout.CENTER);
+        panelIzq.add(logo, BorderLayout.CENTER);
         panelIzq.setBackground(Constantes.colorPrincipal);
         contenedor.add(panelIzq);
-      
+
         //Panel Derecho
         JPanel panelDer = new JPanel();
         panelDer.setLayout(null);
         panelDer.setBackground(Constantes.colorLight);
-        
+
         JLabel title = new JLabel("Inicio de Sesión");
         title.setHorizontalAlignment(JLabel.CENTER);
         title.setFont(Constantes.fontBold);
         title.setBounds(25, 15, 150, 20);
         panelDer.add(title);
-        
+
         JLabel userLabel = new JLabel("Usuario");
         userLabel.setFont(Constantes.fontPlain);
-        userLabel.setBounds(10,60,60,20);
+        userLabel.setBounds(10, 60, 60, 20);
         panelDer.add(userLabel);
-        
-        
-        userField = new JTextField();
-        userField.setBounds(10,80,170,20);
+
+        String nombresUsuario[] = new String[ListaUsuarios.lista.size()];
+        for (int i = 0; i < nombresUsuario.length; i++) {
+            nombresUsuario[i] = ListaUsuarios.lista.get(i).getNombre();
+        }
+
+        userField = new JComboBox(nombresUsuario);
+        userField.setBounds(10, 80, 170, 20);
         userField.setBorder(new LineBorder(Constantes.colorPrincipal));
         panelDer.add(userField);
-        
+
         JLabel passwordLabel = new JLabel("Contraseña");
         passwordLabel.setFont(Constantes.fontPlain);
         passwordLabel.setBounds(10, 120, 80, 20);
         panelDer.add(passwordLabel);
-        
+
         passwordField = new JPasswordField();
-        passwordField.setBounds(10,140,140,20);
+        passwordField.setBounds(10, 140, 140, 20);
         passwordField.setBorder(new LineBorder(Constantes.colorPrincipal));
         passwordField.setEchoChar('*');
         panelDer.add(passwordField);
-        
+
         viewPassButton = new JButton();
         viewPassButton.setBounds(160, 140, 20, 20);
         viewPassButton.setIcon(new ImageIcon(Login.class.getResource("vision.png")));
@@ -98,53 +102,56 @@ public class Login extends JFrame{
         viewPassButton.setBackground(null);
         viewPassButton.setBorder(null);
         viewPassButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        viewPassButton.addActionListener(new ActionListener(){
-            
+        viewPassButton.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
-                
-                passwordField.setEchoChar(showPassword? '*':(char)0);
-                viewPassButton.setIcon(showPassword? new ImageIcon(Login.class.getResource("vision.png")): new ImageIcon(Login.class.getResource("no-vision.png")));
-                showPassword=!showPassword;
+
+                passwordField.setEchoChar(showPassword ? '*' : (char) 0);
+                viewPassButton.setIcon(showPassword ? new ImageIcon(Login.class.getResource("vision.png")) : new ImageIcon(Login.class.getResource("no-vision.png")));
+                showPassword = !showPassword;
             }
         });
         panelDer.add(viewPassButton);
-        
+
         loginButton = new JButton("Entrar");
-        loginButton.setBounds(60,200,80,25);
+        loginButton.setBounds(60, 200, 80, 25);
         loginButton.setBackground(Constantes.colorPrincipal);
         loginButton.setForeground(Constantes.colorLight);
         loginButton.setBorder(null);
         loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        loginButton.addMouseListener(new ButtonHover(loginButton,ButtonHover.BACKGROUND));
-        loginButton.addActionListener(new ActionListener(){
-            
+        loginButton.addMouseListener(new ButtonHover(loginButton, ButtonHover.BACKGROUND));
+        loginButton.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
-                validaPassword();
+
+                Usuario u = ListaUsuarios.get(userField.getSelectedIndex());
+                if (Arrays.compare(passwordField.getPassword(), u.getPassword()) == 0) {
+                    u.setSesionActiva(true);
+                    Principal ventanaPrincipal = new Principal();
+                    setVisible(false);
+                    ventanaPrincipal.setVisible(true);
+
+                    //TEST -------------------------------------------------------------------------
+                    System.out.println("Usuarios Registrados Despues del login: ");
+                    for (Usuario us : ListaUsuarios.lista) {
+                        String password = "";
+                        for (int i = 0; i < us.getPassword().length; i++) {
+                            password += us.getPassword()[i];
+                        }
+                        System.out.println(us.getNombre() + " " + password + " Activo: " + us.isSesionActiva());
+                    }
+                    //TEST ------------------------------------------------------------------------------------
+                } else {
+                    JOptionPane.showMessageDialog(contexto, "Contraseña Incorrecta", "ACCESO DENEGADO", JOptionPane.WARNING_MESSAGE);
+                }
+
             }
-        
+
         });
         panelDer.add(loginButton);
-        
+
         contenedor.add(panelDer);
-    }
-    
-    private void validaPassword(){
-        
-        if (userField.getText().equals(user) && Arrays.compare(passwordField.getPassword(), password) == 0){
-            
-            Principal  ventanaPrincipal = new Principal();
-            setVisible(false);
-            ventanaPrincipal.setVisible(true);
-            
-        }else{
-            JOptionPane.showMessageDialog(null, "Usuario y/o contraseña incorrectos", "ACCESO DENEGADO", JOptionPane.WARNING_MESSAGE);
-        }
-    }
-    
-    private void ponerBg(JComponent c){
-        c.setOpaque(true);
-        c.setBackground(Constantes.colorAcent);
     }
 }

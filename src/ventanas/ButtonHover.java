@@ -8,7 +8,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author pablo
+ * @author pablo Erick Ramírez Cruz
  */
 public class ButtonHover extends MouseAdapter {
     

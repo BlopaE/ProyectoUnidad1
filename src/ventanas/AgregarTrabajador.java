@@ -8,6 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import model.ListaTrabajadores;
+import model.Trabajador;
 
 /**
  *
@@ -15,12 +17,13 @@ import javax.swing.JTextField;
  */
 public class AgregarTrabajador extends JFrame{
     
-    private JTextField nombreTF,sueldoTF;
+    private JTextField nombreTF,apellidoTF,sueldoTF;
     private JButton guardar;
 
-    public AgregarTrabajador() {
+    public AgregarTrabajador(String tipo, ListaTrabajadores lista, Table tabla) {
         
-        this.setSize(300,200);
+        
+        this.setSize(300,300);
         this.setResizable(false);
         this.setAlwaysOnTop(true);
         this.setTitle("AGREGAR TRABAJADOR");
@@ -38,18 +41,28 @@ public class AgregarTrabajador extends JFrame{
         nombreTF.setFont(Constantes.fontPlain);
         contenedor.add(nombreTF);
         
+        JLabel apellido = new JLabel("APELLIDO: ");
+        apellido.setBounds(20, 75, 100, 20);
+        apellido.setFont(Constantes.fontBold);
+        contenedor.add(apellido);
+        
+        apellidoTF = new JTextField();
+        apellidoTF.setBounds(110, 75, 140, 20);
+        apellidoTF.setFont(Constantes.fontPlain);
+        contenedor.add(apellidoTF);
+        
         JLabel sueldo = new JLabel("SUELDO: ");
-        sueldo.setBounds(20, 80, 100, 20);
+        sueldo.setBounds(20, 120, 100, 20);
         sueldo.setFont(Constantes.fontBold);
         contenedor.add(sueldo);
         
         sueldoTF = new JTextField();
-        sueldoTF.setBounds(110, 80, 140, 20);
+        sueldoTF.setBounds(110, 120, 140, 20);
         sueldoTF.setFont(Constantes.fontPlain);
         contenedor.add(sueldoTF);
         
         guardar = new JButton("Guardar");
-        guardar.setBounds(20, 110, 240, 30);
+        guardar.setBounds(20, 200, 240, 30);
         guardar.setBackground(Constantes.colorPrincipal);
         guardar.setForeground(Constantes.colorLight);
         guardar.setBorder(null);
@@ -58,6 +71,9 @@ public class AgregarTrabajador extends JFrame{
             
             @Override
             public void actionPerformed(ActionEvent e) {
+                Trabajador t = new Trabajador(nombreTF.getText(),apellidoTF.getText(),Float.parseFloat(sueldoTF.getText()),tipo);
+                lista.addTrabajador(t);
+                tabla.actualizarTabla(lista.toTable(), Principal.encabezados);
                 setVisible(false);
             }
             
@@ -65,6 +81,7 @@ public class AgregarTrabajador extends JFrame{
         contenedor.add(guardar);
         
     }
+   
     
     
 }
